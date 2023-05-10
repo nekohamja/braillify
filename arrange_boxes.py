@@ -28,27 +28,23 @@ def sort_letters(predict_json: json):
     def sortY(val): return val[1]
     def sortX(val): return val[0]
     pred_shape.sort(key= sortY)
-
-
     pred_shape.sort(key= sortX)
     arr = np.array(pred_shape)
 
+    #---------WORK IN PROGRESS---------
     #manually get the difference
 
     #find threshold to break the line  / mean: avg / y value increases the more letters go down
     #y_threshold = np.mean(arr[:, 1], dtype = 'float') // 2
     #boxes_diff = np.diff(np.append(arr[:, 1], arr))
-
-    sorted_list = arr.tolist()
-
-
-#test
+    
+    #test
     #print(arr)
     #print('-----x-------y---width---height---label')
     #print(y_threshold)
 
+    sorted_list = arr.tolist()
 
-    
     #output the string result
     squeeze = [x.pop(4) for x in sorted_list]
     final_result = ("".join(squeeze))

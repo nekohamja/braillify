@@ -1,6 +1,8 @@
 # braillify
 Braillify: Optical Braille Symbols Detection + Text to Speech using Roboflow model (yolov5)
 
+---WORK IN PROGRESS---
+
 https://braillify.streamlit.app
 
 ## References

@@ -28,7 +28,7 @@ def sort_letters(predict_json: json):
     pred_shape.sort(key= sortY)
 
     #line break/space threshold
-    arr = np.array(pred_shape)
+    arr = np.array(pred_shape, dtype=object)
  
     y_diff = np.array(preds_y)
     y_diff.sort()
@@ -40,7 +40,7 @@ def sort_letters(predict_json: json):
     #check if img is sentence or paragraph
     if len(y_threshold_index) == 0:
         pred_shape.sort(key= sortX)
-        arr = np.array(pred_shape)
+        arr = np.array(pred_shape, dtype=object)
         sorted_list = arr.tolist()
         labels = [x.pop(4) for x in sorted_list]
         final_result = ("".join(labels))

@@ -72,40 +72,17 @@ with col1:
         
 #scan process (if uploaded image is not selected, scan the sample image)
 with col2:
-    start_time = time.time()
-    if upload_image is None:
-        sample_file = 'sample_image.jpg'
-        predict = model.predict(sample_file, confidence=confidence, overlap=overlap_threshold)
-        def process_image():
-            with tempfile.TemporaryDirectory(prefix='braillify_') as tmpdir:
-                file_path = f"{tmpdir}/{sample_file}"
-                predict.save(output_path = f"{tmpdir}/result_{sample_file}")
-                uploadedImages.put(b'uploaded_image.jpg', path = f"{tmpdir}/result_{sample_file}")
-                return predict
-        predict = process_image()
-        upload = uploadedImages.get('uploaded_image.jpg')
-        content = upload.read()
-        col2.write("Result")
-        col2.image(content)
-        upload.close()
-        text_output = generate_output_text()
-        generate_output_speech()
-        create_download_button()
-        st.success(f'Success! took {time.time() - start_time:.2f} seconds.', icon="✅")
-        st.write("Use the Slider panel below to adjust the detection results.")
-    else:
+    with st.spinner('Processing Image'):
         start_time = time.time()
-        try:
+        if upload_image is None:
+            sample_file = 'sample_image.jpg'
+            predict = model.predict(sample_file, confidence=confidence, overlap=overlap_threshold)
             def process_image():
                 with tempfile.TemporaryDirectory(prefix='braillify_') as tmpdir:
-                    file_path = f"{tmpdir}/{upload_image.name}"
-                    os.makedirs(os.path.dirname(file_path), exist_ok=True)
-                    with open(file_path, "wb") as img_file:
-                        img_file.write(upload_image.getbuffer())
-                    predict = model.predict(file_path, confidence=confidence, overlap=overlap_threshold)
-                    predict.save(output_path = f"{tmpdir}/result_{upload_image.name}")
-                    uploadedImages.put(b'uploaded_image.jpg', path = f"{tmpdir}/result_{upload_image.name}")
-                    return predict  
+                    file_path = f"{tmpdir}/{sample_file}"
+                    predict.save(output_path = f"{tmpdir}/result_{sample_file}")
+                    uploadedImages.put(b'uploaded_image.jpg', path = f"{tmpdir}/result_{sample_file}")
+                    return predict
             predict = process_image()
             upload = uploadedImages.get('uploaded_image.jpg')
             content = upload.read()
@@ -116,7 +93,30 @@ with col2:
             generate_output_speech()
             create_download_button()
             st.success(f'Success! took {time.time() - start_time:.2f} seconds.', icon="✅")
-            st.write("Use the Slider panel below to adjust the detection results.")
-        except Exception as ex:
-            st.write("Please try again. Make sure there are visible braille characters!")
-            st.write("You may also use the Slider panel to adjust the detection result.") 
+            st.info("Use the Slider below to adjust detection results.")
+        else:
+            try:
+                def process_image():
+                    with tempfile.TemporaryDirectory(prefix='braillify_') as tmpdir:
+                        file_path = f"{tmpdir}/{upload_image.name}"
+                        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+                        with open(file_path, "wb") as img_file:
+                            img_file.write(upload_image.getbuffer())
+                        predict = model.predict(file_path, confidence=confidence, overlap=overlap_threshold)
+                        predict.save(output_path = f"{tmpdir}/result_{upload_image.name}")
+                        uploadedImages.put(b'uploaded_image.jpg', path = f"{tmpdir}/result_{upload_image.name}")
+                        return predict  
+                predict = process_image()
+                upload = uploadedImages.get('uploaded_image.jpg')
+                content = upload.read()
+                col2.write("Result")
+                col2.image(content)
+                upload.close()
+                text_output = generate_output_text()
+                generate_output_speech()
+                create_download_button()
+                st.success(f'Success! took {time.time() - start_time:.2f} seconds.', icon="✅")
+                st.info("Use the Slider panel below to adjust the detection results.")
+            except Exception as ex:
+                st.error("Please try again. Make sure there are visible braille characters!")
+                st.error("You may also use the Slider panel to adjust the detection result.") 

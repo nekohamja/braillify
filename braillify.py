@@ -6,13 +6,14 @@ from PIL import Image
 import os
 from arrange_boxes import sort_letters
 from text_to_speech import text_to_speech
+from remove_streamlit_logo import remove_streamlit_logo
 import numpy as np
 import io
 import tempfile
 import time
 
 
-
+remove_streamlit_logo()
 
 #ui elements
 st.markdown("<h1 style='text-align: center;'>Braillify</h1>", unsafe_allow_html=True)
@@ -118,36 +119,4 @@ with col2:
             st.write("Use the Slider panel below to adjust the detection results.")
         except Exception as ex:
             st.write("Please try again. Make sure there are visible braille characters!")
-            st.write("You may also use the Slider panel to adjust the detection result.")
-
-#remove hamburger menu and streamlit logo
-hide_streamlit_style = """
-            <style>
-            #MainMenu {visibility: hidden;}
-            footer {
-                visibility: hidden;
-                }
-            footer:after {
-	            content:' '; 
-	            visibility: visible;
-	            display: block;
-	            position: relative;
-	            #background-color: black;
-	            padding: 5px;
-	            top: 2px;
-            }
-            </style>
-            """
-st.markdown(hide_streamlit_style, unsafe_allow_html=True)    
-
-
-
-
-
-
-        
-
-
-
-
-    
+            st.write("You may also use the Slider panel to adjust the detection result.") 

@@ -17,7 +17,7 @@ remove_streamlit_logo()
 
 #ui elements
 st.markdown("<h1 style='text-align: center;'>Braillify</h1>", unsafe_allow_html=True)
-st.markdown("<h3 style='text-align: center; color: grey;'>Optical Braille Alphabet Recognizer + Text to Speech</h1>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center; color: grey;'>Optical Braille Alphabet Recognizer (YOLO algorithm)</h1>", unsafe_allow_html=True)
 st.text("")
 st.text("")
 st.markdown("<p style='text-align: center;'>Note: Clean background and proper distance give more accurate results!</p>", unsafe_allow_html=True)

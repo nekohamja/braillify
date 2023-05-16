@@ -1,5 +1,5 @@
 # braillify
-Braillify: Optical Braille Symbols Recognizer + Text to Speech using YOLOv5 and YOLOv8 algorithm
+Braillify: Grade 1 Braille Symbols Recognizer + Text to Speech using YOLOv5 and YOLOv8 algorithm
 
 ---WORK IN PROGRESS---
 

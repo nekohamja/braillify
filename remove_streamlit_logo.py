@@ -25,7 +25,7 @@ def remove_streamlit_logo():
                     background-color: #CADFF3;
                 } 
                 .stTabs [data-baseweb="tab-list"] button [data-testid="stMarkdownContainer"] p {
-                    font-size:2rem;
+                    font-size:1rem;
                 }  
                 </style>
                 """

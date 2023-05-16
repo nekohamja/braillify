@@ -23,12 +23,10 @@ def remove_streamlit_logo():
                     border-radius: 8px;
                     padding: 5% 5% 5% 5%;
                     background-color: #CADFF3;
-                <style>
-                    .stTabs [data-baseweb="tab-list"] button [data-testid="stMarkdownContainer"] p {
-                    font-size:2rem;
-                    }
-                </style>   
                 } 
+                .stTabs [data-baseweb="tab-list"] button [data-testid="stMarkdownContainer"] p {
+                    font-size:2rem;
+                }  
                 </style>
                 """
     st.markdown(hide_streamlit_style, unsafe_allow_html=True)    

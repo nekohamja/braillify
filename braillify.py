@@ -102,7 +102,7 @@ with col2:
                     uploadedImages.put(bytes(url, encoding = 'utf-8'), path = f"{tmpdir}/result_{sample_file}")
                     return predict
             predict = process_image()
-            upload = uploadedImages.get('uploaded_image.jpg')
+            upload = uploadedImages.get(f"uploaded_image_{sample_file}")
             content = upload.read()
             col2.write("YOLOv5 algorithm result: ")
             col2.image(content)
@@ -125,7 +125,7 @@ with col2:
                         uploadedImages.put(bytes(url, encoding = 'utf-8'), path = f"{tmpdir}/result_{upload_image.name}")
                         return predict  
                 predict = process_image()
-                upload = uploadedImages.get('uploaded_image.jpg')
+                upload = uploadedImages.get(f"uploaded_image_{upload_image.name}")
                 content = upload.read()
                 col2.write("YOLOv5 algorithm result: ")
                 col2.image(content)

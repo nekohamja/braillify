@@ -1,5 +1,5 @@
 # braillify (YOLO)
-Braillify: Optical Braille Symbols Recognizer + Text to Speech using YOLO algorithm (yolov5 roboflow model)
+Braillify: Optical Braille Symbols Recognizer + Text to Speech using YOLOv5 and YOLOv8 algorithm
 
 ---WORK IN PROGRESS---
 

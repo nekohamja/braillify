@@ -10,10 +10,9 @@ def remove_streamlit_logo():
                     }
                 footer:after {
                     content:' '; 
-                    visibility: visible;
+                    visibility: hidden;
                     display: block;
                     position: relative;
-                    #background-color: black;
                     padding: 5px;
                     top: 2px;
                 }

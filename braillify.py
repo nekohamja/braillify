@@ -26,7 +26,8 @@ st.text("")
 st.text("")
 st.markdown("<p style='text-align: center;'>Note: Limited to processing words and phrases only.</p>", unsafe_allow_html=True)
 upload_image = st.file_uploader(":camera: Select Photo", type=["png","jpg","jpeg"], label_visibility = 'hidden')
-col1, col2, col3 = st.columns(3)
+col1 = st.container()
+col2, col3 = st.tabs(["YOLOv5 Result","YOLOv8 Result"])
 with st.expander("Click me to adjust results!"):
     confidence = float(st.slider(":arrow_backward: More detections │ Less detections :arrow_forward:", 10, 100, 60,)) / 100        
     overlap_threshold = float(st.slider(":arrow_backward: Less Overlapping labels │ More Overlapping labels :arrow_forward:", 10, 100, 25)) / 100 

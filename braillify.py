@@ -107,8 +107,8 @@ with col2:
             upload.close()
             text_output = generate_output_text()
             generate_output_speech()
-            create_download_button()
             st.success(f'Success! took {time.time() - start_time:.2f} seconds.', icon="✅")
+            create_download_button()
         else:
             try:
                 def process_image():

@@ -17,15 +17,15 @@ remove_streamlit_logo()
 
 #ui elements
 st.markdown("<h1 style='text-align: center;'>Braillify</h1>", unsafe_allow_html=True)
-st.markdown("<h3 style='text-align: center; color: grey;'>Optical Braille Alphabet Recognizer (YOLO algorithm)</h1>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center; color: grey;'>Optical Braille Alphabet Recognizer (YOLOv5 algorithm)</h1>", unsafe_allow_html=True)
 st.text("")
 st.text("")
 st.markdown("<p style='text-align: center;'>Note: Clean background and proper distance give more accurate results!</p>", unsafe_allow_html=True)
 upload_image = st.file_uploader(":camera: Select Photo", type=["png","jpg","jpeg"], label_visibility = 'hidden')
 col1, col2 = st.columns(2)
 with st.expander("Click me to adjust results!"):
-    confidence = float(st.slider("Adjust Confidence", 10, 100, 60,)) / 100        
-    overlap_threshold = float(st.slider("Adjust Overlap Threshold ", 10, 100, 25)) / 100 
+    confidence = float(st.slider("<- More detections │ Less detections ->", 10, 100, 60,)) / 100        
+    overlap_threshold = float(st.slider("<- Less Overlapping labels │ More Overlapping labels ->", 10, 100, 25)) / 100 
 
 
 #yolov5 model using roboflow api

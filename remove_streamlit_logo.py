@@ -21,7 +21,7 @@ def remove_streamlit_logo():
                 [data-testid="column"] {
                     box-shadow: rgb(0 0 0 / 20%) 0px 5px 1px -1px, rgb(0 0 0 / 14%) 0px 1px 1px 0px, rgb(0 0 0 / 12%) 0px 1px 3px 0px;
                     border-radius: 8px;
-                    padding: 1% 1% 1% 1%;
+                    padding: 5% 5% 5% 5%;
                     background-color: #CADFF3;
                 } 
                 </style>

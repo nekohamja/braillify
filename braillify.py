@@ -107,8 +107,8 @@ with col2:
             upload.close()
             text_output = generate_output_text()
             generate_output_speech()
-            st.success(f'Success! took {time.time() - start_time:.2f} seconds.', icon="✅")
             create_download_button()
+            st.success(f'Success! took {time.time() - start_time:.2f} seconds.', icon="✅")
         else:
             try:
                 def process_image():
@@ -129,8 +129,8 @@ with col2:
                 upload.close()
                 text_output = generate_output_text()
                 generate_output_speech()
-                st.success(f'Success! took {time.time() - start_time:.2f} seconds.', icon="✅")
                 create_download_button()
+                st.success(f'Success! took {time.time() - start_time:.2f} seconds.', icon="✅")
             except Exception as ex:
                 st.error("Please try again. Make sure there are visible braille characters or adjust the detection using the slider below.")
 
@@ -182,8 +182,8 @@ with col3:
                 )
                 st.write(str_left_to_right)
             generate_output_speech()
-            st.success(f'Success! took {time.time() - start_timer:.2f} seconds.', icon="✅")
             create_download_button()
+            st.success(f'Success! took {time.time() - start_timer:.2f} seconds.', icon="✅")
         except Exception as ex:
             st.error("Please try again. Make sure there are visible braille characters or adjust the detection using the slider below.")
         

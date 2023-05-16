@@ -1,10 +1,13 @@
 import streamlit as st               
 from roboflow import Roboflow
 from deta import Deta
+from ultralytics import YOLO
+import cv2
 import PIL
 from PIL import Image
 import os
-from arrange_boxes import sort_letters
+from yolov5_arrange_boxes import sort_letters
+from yolov8_arrange_boxes import convert_to_braille_unicode, parse_xywh_and_class
 from text_to_speech import text_to_speech
 from remove_streamlit_logo import remove_streamlit_logo
 import numpy as np
@@ -17,25 +20,36 @@ remove_streamlit_logo()
 
 #ui elements
 st.markdown("<h1 style='text-align: center;'>Braillify</h1>", unsafe_allow_html=True)
-st.markdown("<h3 style='text-align: center; color: grey;'>Optical Braille Alphabet Recognizer (YOLOv5 algorithm)</h1>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center; color: grey;'>Optical Braille Alphabet Recognizer</h1>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center; color: grey;'>(YOLOv5 & YOLOv8 algorithm)</h1>", unsafe_allow_html=True)
 st.text("")
 st.text("")
-st.markdown("<p style='text-align: center;'>Note: Clean background and proper distance give more accurate results!</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center;'>Note: Limited to processing words and phrases only.</p>", unsafe_allow_html=True)
 upload_image = st.file_uploader(":camera: Select Photo", type=["png","jpg","jpeg"], label_visibility = 'hidden')
-col1, col2 = st.columns(2)
+col1, col2, col3 = st.columns(3)
 with st.expander("Click me to adjust results!"):
-    confidence = float(st.slider("<- More detections │ Less detections ->", 10, 100, 60,)) / 100        
-    overlap_threshold = float(st.slider("<- Less Overlapping labels │ More Overlapping labels ->", 10, 100, 25)) / 100 
+    confidence = float(st.slider(":arrow_backward: More detections │ Less detections :arrow_forward:", 10, 100, 60,)) / 100        
+    overlap_threshold = float(st.slider(":arrow_backward: Less Overlapping labels │ More Overlapping labels :arrow_forward:", 10, 100, 25)) / 100 
 
 
 #yolov5 model using roboflow api
 rf = Roboflow(api_key=st.secrets["api_key"]) #add your own api key here
 project = rf.workspace().project("braille-final-27-04")
-model = project.version(2).model
-
-#deta space cloud drive api (for saving img / audio result)
+yolov5 = project.version(2).model
+#deta space cloud drive api (for saving img / audio result of yolov5)
 deta = Deta(st.secrets["deta_key"])  #add your own api key here
 uploadedImages = deta.Drive("uploadedImages")
+
+#yolov8 model
+try:
+    yolov8 = YOLO("yolov8_braille.pt")
+    yolov8.overrides["conf"] = confidence 
+    yolov8.overrides["iou"] = overlap_threshold
+    yolov8.overrides["agnostic_nms"] = False 
+    yolov8.overrides["max_det"] = 1000
+except Exception as ex:
+    st.error("Unable to load model. Try refreshing your browser.")
+
 
 #load the selected image
 def load_image(upload):
@@ -51,14 +65,18 @@ with col1:
         col1.write("Original Image")
         col1.image(image)
 
-#generate output text
+
+        
+#YOLOv5 scan process
+with col2:
+    #generate output text
     def generate_output_text():
         predict_json = predict.json()['predictions']
         text_output = sort_letters(predict_json)
         st.write(text_output)
         return text_output
     
-#download button
+    #download button
     def create_download_button():
         btn = st.download_button(
         label="Download Scanned Image",
@@ -66,17 +84,15 @@ with col1:
         file_name = f"image_result.jpg",
         mime = "image/png")
 
-#generate output speech
+    #generate output speech
     def generate_output_speech():
         text_to_speech(text_output)
-        
-#scan process (if uploaded image is not selected, scan the sample image)
-with col2:
-    with st.spinner('Processing Image'):
+
+    with st.spinner('YOLOv5 algorithm running...'):
         start_time = time.time()
         if upload_image is None:
             sample_file = 'sample_image.jpg'
-            predict = model.predict(sample_file, confidence=confidence, overlap=overlap_threshold)
+            predict = yolov5.predict(sample_file, confidence=confidence, overlap=overlap_threshold)
             def process_image():
                 with tempfile.TemporaryDirectory(prefix='braillify_') as tmpdir:
                     file_path = f"{tmpdir}/{sample_file}"
@@ -86,14 +102,13 @@ with col2:
             predict = process_image()
             upload = uploadedImages.get('uploaded_image.jpg')
             content = upload.read()
-            col2.write("Result")
+            col2.write("YOLOv5 algorithm result: ")
             col2.image(content)
             upload.close()
             text_output = generate_output_text()
             generate_output_speech()
             create_download_button()
             st.success(f'Success! took {time.time() - start_time:.2f} seconds.', icon="✅")
-            st.info("Use the Slider below to adjust detection results.")
         else:
             try:
                 def process_image():
@@ -102,21 +117,73 @@ with col2:
                         os.makedirs(os.path.dirname(file_path), exist_ok=True)
                         with open(file_path, "wb") as img_file:
                             img_file.write(upload_image.getbuffer())
-                        predict = model.predict(file_path, confidence=confidence, overlap=overlap_threshold)
+                        predict = yolov5.predict(file_path, confidence=confidence, overlap=overlap_threshold)
                         predict.save(output_path = f"{tmpdir}/result_{upload_image.name}")
                         uploadedImages.put(b'uploaded_image.jpg', path = f"{tmpdir}/result_{upload_image.name}")
                         return predict  
                 predict = process_image()
                 upload = uploadedImages.get('uploaded_image.jpg')
                 content = upload.read()
-                col2.write("Result")
+                col2.write("YOLOv5 algorithm result: ")
                 col2.image(content)
                 upload.close()
                 text_output = generate_output_text()
                 generate_output_speech()
                 create_download_button()
                 st.success(f'Success! took {time.time() - start_time:.2f} seconds.', icon="✅")
-                st.info("Use the Slider panel below to adjust the detection results.")
             except Exception as ex:
-                st.error("Please try again. Make sure there are visible braille characters!")
-                st.error("You may also use the Slider panel to adjust the detection result.") 
+                st.error("Please try again. Make sure there are visible braille characters or adjust the detection using the slider below.")
+
+#YOLOv8 scan process
+with col3:
+    #download button
+    def create_download_button():
+        img = Image.fromarray(res_plotted)
+        buf = io.BytesIO()
+        img.save(buf, format="JPEG")
+        byte_im = buf.getvalue()
+        btn = st.download_button(
+        label="Download Scanned Image",
+        data = byte_im,
+        file_name = f"image_result.jpg",
+        mime = "image/png")
+
+    #generate output speech
+    def generate_output_speech():
+        text_to_speech(str_left_to_right)
+
+
+    with st.spinner('YOLOv8 algorithm running...'):
+        start_timer = time.time()
+        try:
+            if upload_image is None:
+                predict = yolov8.predict('sample_image.jpg', exist_ok=True, conf=confidence)
+            else:
+                def process_image():
+                    with tempfile.TemporaryDirectory(prefix='braillify_') as tmpdir:
+                        file_path = f"{tmpdir}/{upload_image.name}"
+                        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+                        with open(file_path, "wb") as img_file:
+                            img_file.write(upload_image.getbuffer())
+                        predict = yolov8.predict(file_path, exist_ok=True, conf=confidence)
+                        return predict  
+                predict = process_image()
+            res_plotted = predict[0].plot()[:, :, ::-1]
+            col3.write("YOLOv8 algorithm result: ")
+            col3.image(res_plotted)
+            boxes = predict[0].boxes     
+            list_boxes = parse_xywh_and_class(boxes)
+            for box_line in list_boxes:
+                str_left_to_right = ""
+                box_classes = box_line[:, -1]
+                for each_class in box_classes:
+                    str_left_to_right += convert_to_braille_unicode(
+                    yolov8.names[int(each_class)]
+                )
+                st.write(str_left_to_right)
+            generate_output_speech()
+            create_download_button()
+            st.success(f'Success! took {time.time() - start_timer:.2f} seconds.', icon="✅")
+        except Exception as ex:
+            st.error("Please try again. Make sure there are visible braille characters or adjust the detection using the slider below.")
+        

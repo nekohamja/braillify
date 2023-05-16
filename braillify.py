@@ -98,7 +98,8 @@ with col2:
                 with tempfile.TemporaryDirectory(prefix='braillify_') as tmpdir:
                     file_path = f"{tmpdir}/{sample_file}"
                     predict.save(output_path = f"{tmpdir}/result_{sample_file}")
-                    uploadedImages.put(b'uploaded_image.jpg', path = f"{tmpdir}/result_{sample_file}")
+                    url = f"uploaded_image_{sample_file}"
+                    uploadedImages.put(bytes(url, encoding = 'utf-8'), path = f"{tmpdir}/result_{sample_file}")
                     return predict
             predict = process_image()
             upload = uploadedImages.get('uploaded_image.jpg')
@@ -120,7 +121,8 @@ with col2:
                             img_file.write(upload_image.getbuffer())
                         predict = yolov5.predict(file_path, confidence=confidence, overlap=overlap_threshold)
                         predict.save(output_path = f"{tmpdir}/result_{upload_image.name}")
-                        uploadedImages.put(b'uploaded_image.jpg', path = f"{tmpdir}/result_{upload_image.name}")
+                        url = f"uploaded_image_{upload_image.name}"
+                        uploadedImages.put(bytes(url, encoding = 'utf-8'), path = f"{tmpdir}/result_{upload_image.name}")
                         return predict  
                 predict = process_image()
                 upload = uploadedImages.get('uploaded_image.jpg')

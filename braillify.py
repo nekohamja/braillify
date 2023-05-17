@@ -77,6 +77,7 @@ with col1:
 #YOLOv5 scan process
 with col2:
     #generate output text
+    col2.empty()
     def generate_output_text():
         predict_json = predict.json()['predictions']
         text_output = sort_letters(predict_json)
@@ -145,6 +146,7 @@ with col2:
 
 #YOLOv8 scan process
 with col3:
+    col3.empty()
     #download button
     def create_download_button():
         img = Image.fromarray(res_plotted)

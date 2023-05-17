@@ -34,19 +34,22 @@ with st.expander("Click me to adjust results!"):
 
 
 #yolov5 model using roboflow api
-rf = Roboflow(api_key=st.secrets["api_key"]) #add your own api key here
-project = rf.workspace().project("braille-final-27-04")
-yolov5 = project.version(2).model
+@st.cache_resource()
+def load_model():
+    rf = Roboflow(api_key=st.secrets["api_key"]) #add your own api key here
+    project = rf.workspace().project("braille-final-27-04")
+    return project.version(2).model
+yolov5 = load_model()
 #deta space cloud drive api (for saving img / audio result of yolov5)
 deta = Deta(st.secrets["deta_key"])  #add your own api key here
 uploadedImages = deta.Drive("uploadedImages")
 
 #yolov8 model
 @st.cache_resource()
-def load_model():
+def load_model_2():
     return YOLO("yolov8_braille.pt")
 try:
-    yolov8 = load_model()
+    yolov8 = load_model_2()
     yolov8.overrides["conf"] = confidence 
     yolov8.overrides["iou"] = overlap_threshold
     yolov8.overrides["agnostic_nms"] = False 

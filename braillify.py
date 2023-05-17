@@ -42,10 +42,10 @@ deta = Deta(st.secrets["deta_key"])  #add your own api key here
 uploadedImages = deta.Drive("uploadedImages")
 
 #yolov8 model
+@st.cache_resource(hash_funcs={"MyUnhashableClass": lambda _: None})
+def load_model():
+    return YOLO("yolov8_braille.pt")
 try:
-    @st.cache_resource(hash_funcs={"MyUnhashableClass": lambda _: None})
-    def load_model():
-	  return YOLO("yolov8_braille.pt")
     yolov8 = load_model()
     yolov8.overrides["conf"] = confidence 
     yolov8.overrides["iou"] = overlap_threshold

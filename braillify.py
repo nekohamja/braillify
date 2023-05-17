@@ -42,7 +42,7 @@ deta = Deta(st.secrets["deta_key"])  #add your own api key here
 uploadedImages = deta.Drive("uploadedImages")
 
 #yolov8 model
-@st.cache(hash_funcs={"MyUnhashableClass": lambda _: None})
+@st.cache_resource()
 def load_model():
     return YOLO("yolov8_braille.pt")
 try:

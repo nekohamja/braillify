@@ -222,7 +222,7 @@ with col3:
             st.write(f"Accuracy: {percent}%")
             generate_output_speech()
             create_download_button()
-            st.success(f'Success! \n took {time.time() - start_timer:.2f} seconds.', icon="✅")
+            st.success(f'Success! \ntook {time.time() - start_timer:.2f} seconds.', icon="✅")
         except Exception as ex:
             st.error("Please try again. Make sure there are visible braille characters or adjust the detection using the slider below.")
         

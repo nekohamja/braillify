@@ -14,6 +14,7 @@ import numpy as np
 import io
 import tempfile
 import time
+import decimal
 
 
 remove_streamlit_logo()
@@ -90,6 +91,17 @@ with col2:
         data = content,
         file_name = f"image_result.jpg",
         mime = "image/png")
+        
+    #percentage
+    def get_percentage():
+        preds_confidence= []
+        for result in predict:
+            preds_confidence.append(result['confidence'])
+        mean = np.mean(np.array(preds_confidence))
+        percent = mean * 100
+        decimalValue = decimal.Decimal(percent)
+        roundedNumber = decimalValue.quantize(decimal.Decimal('0.00'))
+        return roundedNumber
 
     #generate output speech
     def generate_output_speech():
@@ -108,12 +120,14 @@ with col2:
                     uploadedImages.put(bytes(url, encoding = 'utf-8'), path = f"{tmpdir}/result_{sample_file}")
                     return predict
             predict = process_image()
+            percent = get_percentage()
             upload = uploadedImages.get(f"uploaded_image_{sample_file}")
             content = upload.read()
             col2.write("YOLOv5 algorithm result: ")
             col2.image(content)
             upload.close()
             text_output = generate_output_text()
+            st.write(f"Accuracy: {percent}%")
             generate_output_speech()
             create_download_button()
             st.success(f'Success! took {time.time() - start_time:.2f} seconds.', icon="✅")
@@ -131,12 +145,14 @@ with col2:
                         uploadedImages.put(bytes(url, encoding = 'utf-8'), path = f"{tmpdir}/result_{upload_image.name}")
                         return predict  
                 predict = process_image()
+                percent = get_percentage()
                 upload = uploadedImages.get(f"uploaded_image_{upload_image.name}")
                 content = upload.read()
                 col2.write("YOLOv5 algorithm result: ")
                 col2.image(content)
                 upload.close()
                 text_output = generate_output_text()
+                st.write(f"Accuracy: {percent}%")
                 generate_output_speech()
                 create_download_button()
                 st.success(f'Success! took {time.time() - start_time:.2f} seconds.', icon="✅")
@@ -160,6 +176,17 @@ with col3:
     #generate output speech
     def generate_output_speech():
         text_to_speech(str_left_to_right)
+        
+    #percentage
+    def get_percentage():
+        preds_confidence= []
+        for result in confidences:
+            preds_confidence.append(result)
+        mean = np.mean(np.array(preds_confidence))
+        percent = mean * 100
+        decimalValue = decimal.Decimal(percent)
+        roundedNumber = decimalValue.quantize(decimal.Decimal('0.00'))
+        return roundedNumber
 
 
     with st.spinner('YOLOv8 algorithm running...'):
@@ -181,6 +208,8 @@ with col3:
             col3.write("YOLOv8 algorithm result: ")
             col3.image(res_plotted)
             boxes = predict[0].boxes     
+            confidences = boxes.conf.numpy()
+            percent = get_percentage()
             list_boxes = parse_xywh_and_class(boxes)
             for box_line in list_boxes:
                 str_left_to_right = ""
@@ -190,6 +219,7 @@ with col3:
                     yolov8.names[int(each_class)]
                 )
                 st.write(str_left_to_right)
+            st.write(f"Accuracy: {percent}%")
             generate_output_speech()
             create_download_button()
             st.success(f'Success! took {time.time() - start_timer:.2f} seconds.', icon="✅")
